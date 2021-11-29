@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '0.9-SNAPSHOT'
 	id 'maven-publish'
+	id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -41,6 +42,7 @@ dependencies {
 
 	sourceSets.main.java.srcDirs += (project(':3dSkinLayers-Shared').sourceSets.main.java.srcDirs)
 	sourceSets.main.resources.srcDirs += (project(':3dSkinLayers-Shared').sourceSets.main.resources.srcDirs)
+	
 }
 
 minecraft {
@@ -59,6 +61,17 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 	it.options.release = 16;
 	options.forkOptions.jvmArgs.addAll("--enable-preview")
+}
+
+shadowJar {
+   relocate 'dev.tr7zw.modlib', 'dev.tr7zw.skinlayers.modlib'
+   configurations = []
+}
+
+tasks.getByName("remapJar") {
+	dependsOn("shadowJar")
+	mustRunAfter("shadowJar")
+	input  = tasks.getByName("shadowJar").archivePath
 }
 
 java {
